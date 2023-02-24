@@ -5,16 +5,16 @@ namespace UsuariosApi.Data
     public class CreateUsuarioDto
     {
         [Required]
-        public int Username { get; set; }
+        public string Username { get; set; }
         [Required]
-        public int Email { get; set; }
+        public string Email { get; set; }
         [Required]
         [DataType(DataType.Password)]
-        public int Password { get; set; }
+        public string Password { get; set; }
         [Required]
         // esse campo só vai ser valido se a comparação com o outro campo 
         // também for válida 
         [Compare("Password")]
-        public int RePassword { get; set; }
+        public string RePassword { get; set; }
     }
 }

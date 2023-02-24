@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -14,6 +15,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UsuariosApi.Data;
+using UsuariosApi.Services;
 
 namespace UsuariosApi
 {
@@ -29,16 +31,32 @@ namespace UsuariosApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // configuração do banco 
-            services.AddDbContext<UserDbContext>(options => 
-                    options.UseMySQL(Configuration.GetConnectionString("UsuarioConnection")));
-            // configuração do uso do identity
-            // vamos usar para armazenar os dados de autenticação (AddEntityFrameworkStores)
-            services.AddIdentity<IdentityUser<int>, IdentityRole<int>>()
-                    .AddEntityFrameworkStores<UserDbContext>();
+            services.AddDbContext<UserDbContext>(
+                    options => options.UseMySQL(Configuration.GetConnectionString("UsuarioConnection")));
+            services
+            // queremos que o email adicionado tenha o email obrigatório 
+                .AddIdentity<IdentityUser<int>, IdentityRole<int>>(
+                    opt => opt.SignIn.RequireConfirmedEmail = true
+                )
+                .AddEntityFrameworkStores<UserDbContext>();
             services.AddControllers();
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "UsuariosApi", Version = "v1" });
+            });
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+            services.AddScoped<CadastroService, CadastroService>();
+            services.AddScoped<LoginService, LoginService>();
+            services.AddScoped<TokenService, TokenService>();
+            services.AddScoped<LogoutService, LogoutService>();
+            services.Configure<IdentityOptions>(options =>
+            {
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequiredLength = 8;
+            });
         }
+        
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
