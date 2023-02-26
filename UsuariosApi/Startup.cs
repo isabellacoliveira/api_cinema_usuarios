@@ -31,14 +31,14 @@ namespace UsuariosApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<UserDbContext>(
-                    options => options.UseMySQL(Configuration.GetConnectionString("UsuarioConnection")));
+            services.AddDbContext<UserDbContext>(options => options.UseMySQL(Configuration.GetConnectionString("UsuarioConnection")));
             services
-            // queremos que o email adicionado tenha o email obrigatório 
-                .AddIdentity<IdentityUser<int>, IdentityRole<int>>(
-                    opt => opt.SignIn.RequireConfirmedEmail = true
-                )
-                .AddEntityFrameworkStores<UserDbContext>();
+                .AddIdentity<IdentityUser<int>, IdentityRole<int>>(opt =>
+                {
+                    opt.SignIn.RequireConfirmedEmail = true;
+                })
+                .AddEntityFrameworkStores<UserDbContext>()
+                .AddDefaultTokenProviders();
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -46,17 +46,10 @@ namespace UsuariosApi
             });
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddScoped<CadastroService, CadastroService>();
-            services.AddScoped<LoginService, LoginService>();
             services.AddScoped<TokenService, TokenService>();
+            services.AddScoped<LoginService, LoginService>();
             services.AddScoped<LogoutService, LogoutService>();
-            services.Configure<IdentityOptions>(options =>
-            {
-                options.Password.RequireNonAlphanumeric = false;
-                options.Password.RequireUppercase = false;
-                options.Password.RequiredLength = 8;
-            });
         }
-        
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
