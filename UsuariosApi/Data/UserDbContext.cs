@@ -14,7 +14,7 @@ namespace UsuariosApi.Data
         // essas opções farão referencia ao nosso user db context
         public UserDbContext(DbContextOptions<UserDbContext> opt) : base(opt)
         {
-            
+
         }
     }
 }

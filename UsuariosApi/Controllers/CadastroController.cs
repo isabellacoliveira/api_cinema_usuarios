@@ -1,3 +1,4 @@
+using System;
 using FluentResults;
 using Microsoft.AspNetCore.Mvc;
 using UsuariosApi.Data;
@@ -22,7 +23,11 @@ namespace UsuariosApi.Controllers
         {
             Result resultado =_cadastroService.CadastraUsuario(createDto);
             // se o resultado falhou 
-            if(resultado.IsFailed) return StatusCode(500);
+            if(resultado.IsFailed) 
+            {
+                Console.WriteLine(resultado);
+                return StatusCode(500);
+            }
             return Ok(resultado.Successes);
         }
 
